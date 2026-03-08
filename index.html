@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>RIVEN — rivenworks</title>
 
-  <link rel="icon" id="favicon" type="image/png"/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🕷️</text></svg>"/>
 
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;1,9..40,300&display=swap" rel="stylesheet"/>
   <style>
@@ -317,7 +317,7 @@
             .-."""-.  <br/>
             /  _   _ \ <br/>
             | (o) (o) |<br/>
-            \    -    / <br/>
+            \  .-.  / <br/>
             &nbsp;`'---'`
           </span>
           <div class="cc-title">Digital & Traditional Art</div>
@@ -327,7 +327,7 @@
 
         <div class="ccard" style="--cc:var(--accent2)">
           <span class="cc-ascii">
-             _________<br/>
+            _________<br/>
             | o  o  o |<br/>
             |  words  |<br/>
             |_________|<br/>
@@ -601,13 +601,13 @@
 
   <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     // FAVICON — draw spider on canvas, set as icon
-    (function(){
+    try{(function(){
       const c=document.createElement('canvas');
       c.width=32;c.height=32;
       const x=c.getContext('2d');
       // bg
       x.fillStyle='#060810';
-      x.beginPath();x.roundRect(0,0,32,32,5);x.fill();
+      x.beginPath();x.rect(0,0,32,32);x.fill();
       // web lines
       x.strokeStyle='rgba(99,179,237,0.45)';x.lineWidth=.7;
       [[16,2,16,30],[2,16,30,16],[4,4,28,28],[28,4,4,28]].forEach(([x1,y1,x2,y2])=>{x.beginPath();x.moveTo(x1,y1);x.lineTo(x2,y2);x.stroke();});
@@ -630,7 +630,7 @@
       x.beginPath();x.arc(17.2,12,.75,0,Math.PI*2);x.fill();
       // set favicon
       document.getElementById('favicon').href=c.toDataURL('image/png');
-    })();
+    })();}catch(e){console.warn('favicon failed',e);}
 
     const cursor=document.getElementById('cursor'),ring=document.getElementById('cursorRing');
     let mx=0,my=0,rx=0,ry=0;
@@ -651,5 +651,7 @@
     function spawnParticle(){const p=document.createElement('div');p.className='particle';const size=Math.random()*3+1;const colors=['var(--accent)','var(--accent2)','var(--accent3)','var(--accent4)','var(--accent5)'];const color=colors[Math.floor(Math.random()*colors.length)];const drift=(Math.random()-.5)*200+'px';const dur=Math.random()*12+8;p.style.cssText=`width:${size}px;height:${size}px;background:${color};left:${Math.random()*100}vw;bottom:-10px;--drift:${drift};animation-duration:${dur}s;animation-delay:${Math.random()*5}s;opacity:0.4;`;document.body.appendChild(p);setTimeout(()=>p.remove(),(dur+5)*1000);}
     setInterval(spawnParticle,1000);
     const reveals=document.querySelectorAll('.reveal');
-    const obs=new IntersectionObserver(entries=>{entries.forEach((e,i)=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('visible'),i*100);obs.unobserve(e.target);}});},{threshold:.1});
-    reveals.forEach(r=>obs.observe(r))
+    const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}});},{threshold:0,rootMargin:'0px 0px -40px 0px'});
+    reveals.forEach(r=>obs.observe(r));
+    // fallback: show everything after 2s in case observer doesn't fire
+    setTimeout(()=>{reveals.forEach(r=>r.classList.add('visible'));},2000);
