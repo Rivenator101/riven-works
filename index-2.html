@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RIVEN — rivenworks</title>
+
+  <!-- SVG favicon: little spider on dark bg -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23060810'/%3E%3Cline x1='16' y1='2' x2='16' y2='30' stroke='%2363b3ed' stroke-width='0.7' opacity='0.5'/%3E%3Cline x1='2' y1='16' x2='30' y2='16' stroke='%2363b3ed' stroke-width='0.7' opacity='0.5'/%3E%3Cline x1='5' y1='5' x2='27' y2='27' stroke='%2363b3ed' stroke-width='0.7' opacity='0.5'/%3E%3Cline x1='27' y1='5' x2='5' y2='27' stroke='%2363b3ed' stroke-width='0.7' opacity='0.5'/%3E%3Ccircle cx='16' cy='16' r='5' fill='none' stroke='%2363b3ed' stroke-width='0.7' opacity='0.4'/%3E%3Ccircle cx='16' cy='16' r='10' fill='none' stroke='%2363b3ed' stroke-width='0.7' opacity='0.25'/%3E%3Cellipse cx='16' cy='17' rx='3.5' ry='4.5' fill='%23f687b3'/%3E%3Ccircle cx='16' cy='12.5' r='2.8' fill='%23f687b3'/%3E%3Ccircle cx='14.8' cy='12' r='0.7' fill='%23060810'/%3E%3Ccircle cx='17.2' cy='12' r='0.7' fill='%23060810'/%3E%3Cline x1='12.5' y1='15' x2='7' y2='12' stroke='%2363b3ed' stroke-width='1.1' stroke-linecap='round'/%3E%3Cline x1='12.5' y1='17' x2='6.5' y2='17' stroke='%2363b3ed' stroke-width='1.1' stroke-linecap='round'/%3E%3Cline x1='12.5' y1='19' x2='7' y2='22' stroke='%2363b3ed' stroke-width='1.1' stroke-linecap='round'/%3E%3Cline x1='19.5' y1='15' x2='25' y2='12' stroke='%2363b3ed' stroke-width='1.1' stroke-linecap='round'/%3E%3Cline x1='19.5' y1='17' x2='25.5' y2='17' stroke='%2363b3ed' stroke-width='1.1' stroke-linecap='round'/%3E%3Cline x1='19.5' y1='19' x2='25' y2='22' stroke='%2363b3ed' stroke-width='1.1' stroke-linecap='round'/%3E%3C/svg%3E"/>
+
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;1,9..40,300&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --bg:#060810;--bg2:#0c1020;--surface:#111827;
+      --border:rgba(99,179,237,0.15);--accent:#63b3ed;
+      --accent2:#f6ad55;--accent3:#68d391;--accent4:#f687b3;
+      --accent5:#c084fc;--text:#e2e8f0;--muted:#718096;
+      --glow:rgba(99,179,237,0.25);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;line-height:1.7;overflow-x:hidden;cursor:none;}
+    .cursor{position:fixed;width:12px;height:12px;background:var(--accent);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .2s,height .2s;mix-blend-mode:screen;}
+    .cursor-ring{position:fixed;width:36px;height:36px;border:1px solid rgba(99,179,237,0.5);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .3s,height .3s;}
+    #stars{position:fixed;inset:0;z-index:0;pointer-events:none;}
+    body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px);pointer-events:none;z-index:1;}
+    section{position:relative;z-index:2;}
+
+    /* NAV */
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:1.1rem 3rem;background:rgba(6,8,16,0.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);}
+    .nav-logo{font-family:'Space Mono',monospace;font-size:.85rem;color:var(--accent);letter-spacing:.2em;text-decoration:none;}
+    .nav-logo::before{content:'> ';color:var(--accent2);animation:blink 1.2s step-end infinite;}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+    .nav-links{display:flex;gap:1.4rem;list-style:none;}
+    .nav-links a{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--muted);text-decoration:none;letter-spacing:.12em;text-transform:uppercase;transition:color .2s;position:relative;}
+    .nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:1px;background:var(--accent);transform:scaleX(0);transition:transform .2s;}
+    .nav-links a:hover{color:var(--accent);}
+    .nav-links a:hover::after{transform:scaleX(1);}
+
+    /* HERO */
+    #hero{min-height:100vh;display:flex;align-items:center;padding:0 3rem;overflow:hidden;}
+    .hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(99,179,237,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(99,179,237,0.04) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black,transparent);}
+    .hero-glow{position:absolute;width:700px;height:700px;background:radial-gradient(circle,rgba(99,179,237,0.07) 0%,transparent 70%);top:50%;left:35%;transform:translate(-50%,-50%);pointer-events:none;animation:pglow 4s ease-in-out infinite;}
+    @keyframes pglow{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.1)}}
+    @keyframes fadeup{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+    .hero-content{max-width:800px;}
+    .hero-eyebrow{font-family:'Space Mono',monospace;font-size:.7rem;color:var(--accent);letter-spacing:.3em;text-transform:uppercase;margin-bottom:1.2rem;opacity:0;animation:fadeup .8s .2s ease both;}
+    .hero-name{font-family:'Syne',sans-serif;font-size:clamp(4rem,10vw,8rem);font-weight:800;line-height:.95;letter-spacing:-.03em;background:linear-gradient(135deg,#fff 0%,var(--accent) 50%,var(--accent2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.4rem;opacity:0;animation:fadeup .8s .4s ease both;}
+    .hero-pronouns{font-family:'Space Mono',monospace;font-size:.75rem;color:var(--accent4);letter-spacing:.2em;margin-bottom:.6rem;opacity:0;animation:fadeup .8s .45s ease both;}
+    .hero-tagline{font-family:'Space Mono',monospace;font-size:.75rem;color:var(--accent2);letter-spacing:.18em;margin-bottom:2rem;opacity:0;animation:fadeup .8s .5s ease both;}
+    .hero-bio{font-size:1.1rem;color:var(--muted);max-width:580px;margin-bottom:1.2rem;opacity:0;animation:fadeup .8s .6s ease both;}
+    .hero-bio strong{color:var(--text);font-weight:400;}
+    .hero-quirk{font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);max-width:560px;margin-bottom:2.5rem;opacity:0;animation:fadeup .8s .65s ease both;line-height:1.9;}
+    .hero-quirk .pk{color:var(--accent4);}
+    .hero-quirk .pu{color:var(--accent5);}
+    .hero-cta{display:flex;gap:.8rem;flex-wrap:wrap;opacity:0;animation:fadeup .8s .8s ease both;}
+    .btn{font-family:'Space Mono',monospace;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;padding:.8rem 1.6rem;text-decoration:none;border-radius:2px;transition:all .2s;cursor:none;}
+    .btn-primary{background:var(--accent);color:var(--bg);font-weight:700;}
+    .btn-primary:hover{background:#fff;box-shadow:0 0 24px var(--glow);transform:translateY(-2px);}
+    .btn-ghost{border:1px solid var(--border);color:var(--muted);}
+    .btn-ghost:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-2px);}
+    .btn-pink{border:1px solid rgba(246,135,179,0.3);color:var(--accent4);}
+    .btn-pink:hover{border-color:var(--accent4);transform:translateY(-2px);}
+    .btn-yt{border:1px solid rgba(255,80,80,0.3);color:#ff5050;}
+    .btn-yt:hover{border-color:#ff5050;transform:translateY(-2px);}
+    .hero-stats{position:absolute;right:3rem;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:2rem;opacity:0;animation:fadeup .8s 1s ease both;}
+    .stat{text-align:right;}
+    .stat-num{font-family:'Space Mono',monospace;font-size:2rem;color:var(--accent);font-weight:700;display:block;line-height:1;}
+    .stat-label{font-family:'Space Mono',monospace;font-size:.58rem;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;}
+    .stat-line{width:40px;height:1px;background:var(--border);margin-left:auto;margin-top:.5rem;}
+
+    /* SHARED */
+    .section-label{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--accent);letter-spacing:.3em;text-transform:uppercase;margin-bottom:1rem;display:flex;align-items:center;gap:.8rem;}
+    .section-label::before{content:'';display:block;width:2rem;height:1px;background:var(--accent);}
+    .section-title{font-family:'Syne',sans-serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:800;line-height:1.1;letter-spacing:-.02em;margin-bottom:3rem;}
+    .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease;}
+    .reveal.visible{opacity:1;transform:translateY(0);}
+
+    /* ABOUT */
+    #about{padding:8rem 3rem;max-width:1100px;margin:0 auto;}
+    .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start;}
+    .about-text p{color:var(--muted);margin-bottom:1.2rem;font-size:1.05rem;}
+    .about-text p strong{color:var(--text);font-weight:400;}
+    .about-text p em{color:var(--accent2);font-style:normal;}
+    .about-text p .pk{color:var(--accent4);}
+    .about-terminal{background:var(--surface);border:1px solid var(--border);border-radius:4px;overflow:hidden;font-family:'Space Mono',monospace;font-size:.74rem;}
+    .terminal-bar{background:rgba(255,255,255,0.04);padding:.6rem 1rem;display:flex;align-items:center;gap:.4rem;border-bottom:1px solid var(--border);}
+    .terminal-dot{width:10px;height:10px;border-radius:50%;}
+    .terminal-body{padding:1.4rem;line-height:2.1;}
+    .t-m{color:var(--muted);}.t-a{color:var(--accent);}.t-g{color:var(--accent3);}.t-o{color:var(--accent2);}.t-p{color:var(--accent4);}.t-pu{color:var(--accent5);}
+    .t-cur{display:inline-block;width:8px;height:14px;background:var(--accent);vertical-align:middle;animation:blink 1s step-end infinite;margin-left:2px;}
+    .tags{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.5rem;}
+    .tag{font-family:'Space Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;padding:.28rem .65rem;border-radius:2px;border:1px solid;}
+    .tag-blue{border-color:rgba(99,179,237,0.3);color:var(--accent);}
+    .tag-amber{border-color:rgba(246,173,85,0.3);color:var(--accent2);}
+    .tag-green{border-color:rgba(104,211,145,0.3);color:var(--accent3);}
+    .tag-pink{border-color:rgba(246,135,179,0.3);color:var(--accent4);}
+    .tag-purple{border-color:rgba(192,132,252,0.3);color:var(--accent5);}
+
+    /* CREATIVE */
+    #creative{padding:8rem 3rem;background:linear-gradient(180deg,transparent,var(--bg2) 20%,var(--bg2) 80%,transparent);}
+    .creative-inner{max-width:1100px;margin:0 auto;}
+    .creative-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;}
+    .ccard{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:1.8rem;transition:border-color .2s,transform .2s,box-shadow .2s;position:relative;overflow:hidden;}
+    .ccard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--cc,var(--accent));transform:scaleX(0);transform-origin:left;transition:transform .3s;}
+    .ccard:hover{border-color:rgba(99,179,237,0.3);transform:translateY(-4px);box-shadow:0 20px 40px rgba(0,0,0,0.4);}
+    .ccard:hover::before{transform:scaleX(1);}
+    /* ASCII art icons for cards instead of emoji */
+    .cc-ascii{font-family:'Space Mono',monospace;font-size:.7rem;color:var(--cc,var(--accent));line-height:1.3;margin-bottom:1rem;display:block;opacity:.8;}
+    .cc-title{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:700;margin-bottom:.5rem;}
+    .cc-body{font-size:.87rem;color:var(--muted);line-height:1.6;}
+    .cc-link{display:inline-block;margin-top:1rem;font-family:'Space Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;border-bottom:1px solid;padding-bottom:2px;transition:opacity .2s;}
+    .cc-link:hover{opacity:.7;}
+
+    /* FANDOM */
+    #fandom{padding:8rem 3rem;max-width:1100px;margin:0 auto;}
+    .fandom-intro{color:var(--muted);font-size:1.05rem;max-width:600px;margin-bottom:3rem;}
+    .fandom-intro strong{color:var(--text);font-weight:400;}
+    .fandom-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem;margin-bottom:2.5rem;}
+    .fandom-card{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:1.5rem 1.4rem;transition:transform .2s,border-color .2s,box-shadow .2s;position:relative;overflow:hidden;}
+    .fandom-card::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 120%,var(--fc-glow,rgba(99,179,237,0.06)),transparent 70%);pointer-events:none;}
+    .fandom-card:hover{transform:translateY(-4px);border-color:var(--fc-border,var(--border));box-shadow:0 16px 32px rgba(0,0,0,0.4);}
+    .fc-sigil{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--fc-color,var(--muted));letter-spacing:.1em;margin-bottom:.7rem;display:block;opacity:.7;}
+    .fc-name{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:.3rem;}
+    .fc-sub{font-family:'Space Mono',monospace;font-size:.58rem;color:var(--muted);letter-spacing:.08em;line-height:1.5;}
+    .fandom-note{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent4);border-radius:4px;padding:1.4rem 1.8rem;font-family:'Space Mono',monospace;font-size:.73rem;color:var(--muted);line-height:1.9;}
+    .fandom-note .pk{color:var(--accent4);}
+    .fandom-note .pu{color:var(--accent5);}
+
+    /* PROJECTS */
+    #projects{padding:8rem 3rem;background:linear-gradient(180deg,transparent,var(--bg2) 20%,var(--bg2) 80%,transparent);}
+    .projects-inner{max-width:1100px;margin:0 auto;}
+    .projects-list{display:flex;flex-direction:column;gap:1.5rem;}
+    .project-item{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:2rem 2.5rem;display:grid;grid-template-columns:auto 1fr auto;gap:2rem;align-items:center;transition:border-color .2s,transform .2s;}
+    .project-item:hover{border-color:rgba(99,179,237,0.3);transform:translateX(6px);}
+    .proj-num{font-family:'Space Mono',monospace;font-size:1.8rem;color:rgba(99,179,237,0.2);font-weight:700;line-height:1;}
+    .proj-title{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:.4rem;}
+    .proj-desc{font-size:.88rem;color:var(--muted);}
+    .proj-desc em{color:var(--accent5);font-style:normal;}
+    .proj-tags{display:flex;flex-direction:column;align-items:flex-end;gap:.4rem;}
+    .pbadge{font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;padding:.25rem .6rem;border-radius:2px;white-space:nowrap;}
+    .pb-green{background:rgba(104,211,145,0.1);color:var(--accent3);border:1px solid rgba(104,211,145,0.2);}
+    .pb-blue{background:rgba(99,179,237,0.1);color:var(--accent);border:1px solid rgba(99,179,237,0.2);}
+    .pb-amber{background:rgba(246,173,85,0.1);color:var(--accent2);border:1px solid rgba(246,173,85,0.2);}
+    .pb-pink{background:rgba(246,135,179,0.1);color:var(--accent4);border:1px solid rgba(246,135,179,0.2);}
+    .pb-purple{background:rgba(192,132,252,0.1);color:var(--accent5);border:1px solid rgba(192,132,252,0.2);}
+    .proj-link{font-family:'Space Mono',monospace;font-size:.62rem;color:var(--muted);text-decoration:none;letter-spacing:.1em;transition:color .2s;margin-top:.4rem;display:block;text-align:right;}
+    .proj-link:hover{color:var(--accent);}
+
+    /* LEVITAS */
+    #levitas{padding:8rem 3rem;max-width:1100px;margin:0 auto;position:relative;}
+    #levitas::before{content:'LEVITAS';position:absolute;font-family:'Syne',sans-serif;font-size:clamp(6rem,18vw,18rem);font-weight:800;color:rgba(99,179,237,0.015);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;white-space:nowrap;letter-spacing:-.05em;}
+    .levitas-header{display:grid;grid-template-columns:1fr auto;align-items:end;gap:2rem;margin-bottom:4rem;}
+    .active-badge{font-family:'Space Mono',monospace;font-size:.62rem;padding:.4rem .8rem;border:1px solid var(--accent3);color:var(--accent3);letter-spacing:.12em;text-transform:uppercase;border-radius:2px;white-space:nowrap;}
+    .lev-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:3rem;}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:1.8rem;transition:border-color .2s,transform .2s,box-shadow .2s;position:relative;overflow:hidden;}
+    .card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--card-accent,var(--accent));transform:scaleX(0);transform-origin:left;transition:transform .3s;}
+    .card:hover{border-color:rgba(99,179,237,0.3);transform:translateY(-4px);box-shadow:0 20px 40px rgba(0,0,0,0.4);}
+    .card:hover::before{transform:scaleX(1);}
+    .card-ascii{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--card-accent,var(--accent));line-height:1.3;margin-bottom:1rem;display:block;opacity:.7;}
+    .card-title{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;margin-bottom:.6rem;}
+    .card-body{font-size:.87rem;color:var(--muted);line-height:1.6;}
+    .card-tag{display:inline-block;margin-top:1rem;font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;padding:.25rem .6rem;border-radius:2px;background:rgba(99,179,237,0.1);color:var(--accent);}
+    .lev-timeline{border-left:1px solid var(--border);padding-left:2rem;margin-left:1rem;}
+    .tl-item{position:relative;margin-bottom:2rem;padding-bottom:2rem;border-bottom:1px solid var(--border);}
+    .tl-item:last-child{border-bottom:none;margin-bottom:0;}
+    .tl-item::before{content:'';position:absolute;left:-2.38rem;top:.35rem;width:10px;height:10px;border-radius:50%;background:var(--dot,var(--muted));border:2px solid var(--bg);}
+    .tl-num{font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted);letter-spacing:.2em;margin-bottom:.3rem;}
+    .tl-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;margin-bottom:.4rem;}
+    .tl-desc{font-size:.88rem;color:var(--muted);}
+
+    /* CONTACT */
+    #contact{padding:8rem 3rem;background:linear-gradient(180deg,transparent,var(--bg2) 20%,var(--bg2) 80%,transparent);}
+    .contact-inner{max-width:1100px;margin:0 auto;}
+    .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:start;}
+    .contact-big{font-family:'Syne',sans-serif;font-size:clamp(2.2rem,5vw,4rem);font-weight:800;line-height:1.1;letter-spacing:-.02em;margin-bottom:1.2rem;}
+    .contact-sub{color:var(--muted);font-size:1rem;margin-bottom:2.5rem;}
+    .contact-links{display:flex;flex-direction:column;gap:.7rem;}
+    .contact-link{font-family:'Space Mono',monospace;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;padding:.9rem 1.4rem;border:1px solid var(--border);border-radius:2px;transition:all .2s;display:flex;align-items:center;gap:.8rem;}
+    .contact-link:hover{color:var(--accent);border-color:var(--accent);transform:translateX(4px);}
+    .contact-link.pink:hover{color:var(--accent4);border-color:var(--accent4);}
+    .contact-link.amber:hover{color:var(--accent2);border-color:var(--accent2);}
+    .contact-link.yt:hover{color:#ff5050;border-color:#ff5050;}
+    /* little inline ascii sigils for contact links */
+    .cl-sigil{font-size:.8rem;opacity:.6;letter-spacing:0;}
+
+    /* FOOTER */
+    footer{border-top:1px solid var(--border);padding:2rem 3rem;display:flex;justify-content:space-between;align-items:center;position:relative;z-index:2;}
+    .footer-left{font-family:'Space Mono',monospace;font-size:.63rem;color:var(--muted);letter-spacing:.1em;}
+    .footer-left span{color:var(--accent);}
+    .footer-right{font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted);letter-spacing:.1em;}
+
+    .particle{position:fixed;pointer-events:none;z-index:1;border-radius:50%;animation:floatup linear infinite;}
+    @keyframes floatup{from{transform:translateY(100vh) translateX(0);opacity:0}10%{opacity:1}90%{opacity:1}to{transform:translateY(-100px) translateX(var(--drift));opacity:0}}
+
+    @media(max-width:768px){
+      nav{padding:1rem 1.5rem;}.nav-links{gap:.8rem;}
+      #hero{padding:6rem 1.5rem 3rem;}.hero-stats{display:none;}
+      .about-grid,.contact-grid{grid-template-columns:1fr;gap:2.5rem;}
+      .creative-grid,.lev-cards,.fandom-grid{grid-template-columns:1fr 1fr;}
+      .levitas-header{grid-template-columns:1fr;}
+      #about,#creative,#fandom,#projects,#levitas,#contact{padding:5rem 1.5rem;}
+      .project-item{grid-template-columns:auto 1fr;}.proj-tags{display:none;}
+      footer{flex-direction:column;gap:.5rem;text-align:center;}
+    }
+  </style>
+</head>
+<body>
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+  <canvas id="stars"></canvas>
+
+  <nav>
+    <a href="#hero" class="nav-logo">rivenworks</a>
+    <ul class="nav-links">
+      <li><a href="#about">about</a></li>
+      <li><a href="#creative">creative</a></li>
+      <li><a href="#fandom">fandoms</a></li>
+      <li><a href="#projects">projects</a></li>
+      <li><a href="#levitas">levitas</a></li>
+      <li><a href="#contact">contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-glow"></div>
+    <div class="hero-content">
+      <p class="hero-eyebrow">researcher · inventor · artist · ontario, canada</p>
+      <h1 class="hero-name" id="heroName">RIVEN</h1>
+      <p class="hero-pronouns">she / they / it</p>
+      <p class="hero-tagline">// age 15 · grade 11 · born sep 16 · building things that shouldn't exist yet</p>
+      <p class="hero-bio">I engineer levitation systems. I build AI spider robots. I make art. I write poetry and songs. I <strong>hyperfixate</strong> on fictional characters at 2am. I am <strong>all of these things at once</strong> and I refuse to pick just one.</p>
+      <p class="hero-quirk">
+        <span class="pk">professional overthinker.</span> full-time snack enthusiast.<br/>
+        types faster than brain processes thoughts.<br/>
+        robotics obsessed · hackathon builder · <span class="pu">certified hyperfixator.</span>
+      </p>
+      <div class="hero-cta">
+        <a href="#levitas" class="btn btn-primary">Project Levitas</a>
+        <a href="#projects" class="btn btn-ghost">My Projects</a>
+        <a href="https://ko-fi.com/rivenator101" target="_blank" class="btn btn-pink">Ko-fi</a>
+        <a href="https://www.youtube.com/channel/UCWP9Sqnni0PfHaXmKeNlQ3A" target="_blank" class="btn btn-yt">YouTube</a>
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-num">6</span><span class="stat-label">years on levitas</span><div class="stat-line"></div></div>
+      <div class="stat"><span class="stat-num">4</span><span class="stat-label">active projects</span><div class="stat-line"></div></div>
+      <div class="stat"><span class="stat-num">∞</span><span class="stat-label">hyperfixations</span><div class="stat-line"></div></div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="reveal">
+      <p class="section-label">who i am</p>
+      <h2 class="section-title">Engineer. Artist.<br/>Fifteen & unhinged.</h2>
+    </div>
+    <div class="about-grid reveal">
+      <div class="about-text">
+        <p>I'm Riven — a fifteen-year-old independent researcher, self-taught digital and traditional artist, poet, songwriter, AI tinkerer, and robotics obsessive based in Ontario, Canada.</p>
+        <p>I've been obsessed with <strong>levitation</strong> since age nine. I'm building a quad spider robot with a self-aware AI. I build apps at hackathons that win things. I draw fanart of characters I love. I write songs the world hasn't heard yet.</p>
+        <p>I've placed in hackathons, written formal research reports, and I'm emailing university professors at fifteen. <span class="pk">I contain multitudes and I'm fine with that.</span></p>
+        <div class="tags">
+          <span class="tag tag-blue">engineer</span>
+          <span class="tag tag-pink">artist</span>
+          <span class="tag tag-amber">poet</span>
+          <span class="tag tag-green">hackathon builder</span>
+          <span class="tag tag-pink">songwriter</span>
+          <span class="tag tag-blue">robotics</span>
+          <span class="tag tag-purple">AI tinkerer</span>
+          <span class="tag tag-amber">self-taught</span>
+          <span class="tag tag-green">grade 11</span>
+          <span class="tag tag-pink">she/they/it</span>
+        </div>
+      </div>
+      <div class="about-terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot" style="background:#ff5f57"></div>
+          <div class="terminal-dot" style="background:#ffbd2e"></div>
+          <div class="terminal-dot" style="background:#28c840"></div>
+        </div>
+        <div class="terminal-body">
+          <div><span class="t-m">$ </span><span class="t-a">whoami</span></div>
+          <div><span class="t-g">riven</span></div>
+          <div>&nbsp;</div>
+          <div><span class="t-m">$ </span><span class="t-a">cat info.txt</span></div>
+          <div><span class="t-m">age       </span><span class="t-g">15 (sep 16)</span></div>
+          <div><span class="t-m">location  </span><span class="t-g">ontario, canada</span></div>
+          <div><span class="t-m">pronouns  </span><span class="t-p">she / they / it</span></div>
+          <div><span class="t-m">grade     </span><span class="t-g">11</span></div>
+          <div><span class="t-m">status    </span><span class="t-o">building everything</span></div>
+          <div>&nbsp;</div>
+          <div><span class="t-m">$ </span><span class="t-a">cat hyperfixation.exe</span></div>
+          <div><span class="t-pu">loading...</span></div>
+          <div><span class="t-p">hellaverse · ninjago</span></div>
+          <div><span class="t-p">monkie kid · batman</span></div>
+          <div><span class="t-m">// </span><span class="t-o">red hood my beloved</span></div>
+          <div>&nbsp;</div>
+          <div><span class="t-m">$ </span><span class="t-cur"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CREATIVE -->
+  <section id="creative">
+    <div class="creative-inner">
+      <div class="reveal">
+        <p class="section-label">creative work</p>
+        <h2 class="section-title">I make things.<br/>Lots of things.</h2>
+      </div>
+      <div class="creative-grid reveal">
+
+        <div class="ccard" style="--cc:var(--accent4)">
+          <span class="cc-ascii">
+            .-."""-.  <br/>
+            /  _   _ \ <br/>
+            | (o) (o) |<br/>
+            \  .-.  / <br/>
+            &nbsp;`'---'`
+          </span>
+          <div class="cc-title">Digital & Traditional Art</div>
+          <div class="cc-body">Self-taught in both digital and traditional mediums. Fanart, original characters, whatever the current hyperfixation demands. Things I love, drawn and put on the internet.</div>
+          <a href="https://ko-fi.com/rivenator101" target="_blank" class="cc-link" style="color:var(--accent4);border-color:rgba(246,135,179,0.4)">ko-fi ↗</a>
+        </div>
+
+        <div class="ccard" style="--cc:var(--accent2)">
+          <span class="cc-ascii">
+            _________<br/>
+            | o  o  o |<br/>
+            |  words  |<br/>
+            |_________|<br/>
+            &nbsp;| writing |
+          </span>
+          <div class="cc-title">Poetry, Fiction & Writing</div>
+          <div class="cc-body">Poet. Author. Words are another kind of engineering — you're building feelings instead of machines. Things that live in my head until they have to come out.</div>
+          <a href="https://www.tumblr.com/blog/liz-lives" target="_blank" class="cc-link" style="color:var(--accent2);border-color:rgba(246,173,85,0.4)">tumblr ↗</a>
+        </div>
+
+        <div class="ccard" style="--cc:var(--accent3)">
+          <span class="cc-ascii">
+            &nbsp;♩ ♪ ♫ ♬<br/>
+            ~~~~~~~~~~~<br/>
+            &nbsp;♬ ♩ ♪ ♫<br/>
+            ~~~~~~~~~~~<br/>
+            &nbsp;♫ ♬ ♩ ♪
+          </span>
+          <div class="cc-title">Songwriting & Singing</div>
+          <div class="cc-body">I write songs and I sing them. Most of them nobody has heard yet. Music is where the stuff that doesn't fit anywhere else goes.</div>
+          <a href="https://www.youtube.com/channel/UCWP9Sqnni0PfHaXmKeNlQ3A" target="_blank" class="cc-link" style="color:var(--accent3);border-color:rgba(104,211,145,0.4)">youtube ↗</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FANDOMS -->
+  <section id="fandom">
+    <div class="reveal">
+      <p class="section-label">the fandom side</p>
+      <h2 class="section-title">Current hyperfixations.<br/><span style="color:var(--accent4)">No apologies.</span></h2>
+    </div>
+    <p class="fandom-intro reveal">I am a <strong>person of many obsessions</strong> and I think that's important to document publicly. The art brain, the fanfic brain, the "I just need to talk about this character for four hours" brain — it's all the same brain.</p>
+    <div class="fandom-grid reveal">
+
+      <div class="fandom-card" style="--fc-border:rgba(255,80,80,0.4);--fc-glow:rgba(255,80,80,0.06);--fc-color:#ff5050">
+        <span class="fc-sigil">[ /\/\ ] hazbin · helluva</span>
+        <div class="fc-name">Hellaverse</div>
+        <div class="fc-sub">the whole thing.<br/>no i will not calm down.</div>
+      </div>
+
+      <div class="fandom-card" style="--fc-border:rgba(99,179,237,0.4);--fc-glow:rgba(99,179,237,0.06);--fc-color:var(--accent)">
+        <span class="fc-sigil">[ >|< ] spinjitzu forever</span>
+        <div class="fc-name">Lego Ninjago</div>
+        <div class="fc-sub">my beloved forever fandom.<br/>been here for years.</div>
+      </div>
+
+      <div class="fandom-card" style="--fc-border:rgba(246,173,85,0.4);--fc-glow:rgba(246,173,85,0.06);--fc-color:var(--accent2)">
+        <span class="fc-sigil">[ ~*~ ] criminally underrated</span>
+        <div class="fc-name">Lego Monkie Kid</div>
+        <div class="fc-sub">more people need to<br/>watch this show.</div>
+      </div>
+
+      <div class="fandom-card" style="--fc-border:rgba(192,132,252,0.4);--fc-glow:rgba(192,132,252,0.06);--fc-color:var(--accent5)">
+        <span class="fc-sigil">[ ||| ] outlaws · outsiders</span>
+        <div class="fc-name">Batman</div>
+        <div class="fc-sub">red hood specifically.<br/>red hood forever.</div>
+      </div>
+
+    </div>
+    <div class="fandom-note reveal">
+      <span class="pk">// note from riven:</span> I draw fanart, I have Thoughts, I will not shut up about these characters if you ask me. Art finds its way to Ko-fi and Tumblr. The thoughts end up in conversations at 2am. <span class="pu">If you share any of these obsessions — hi, we should talk.</span>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <div class="projects-inner">
+      <div class="reveal">
+        <p class="section-label">tech projects</p>
+        <h2 class="section-title">Things I've built.</h2>
+      </div>
+      <div class="projects-list reveal">
+
+        <div class="project-item">
+          <div class="proj-num">01</div>
+          <div>
+            <div class="proj-title">SoulScape</div>
+            <div class="proj-desc">A digital safe space that turns emotions into living abstract art. Type how you feel — messy, uncertain, contradictory — and SoulScape translates it into a responsive visual environment. No scores, no labels, no judgment. Built for people tired of rating their feelings on a number scale. <strong>Honorable Mention — PeerBridge Mental Health Hacks 2025.</strong></div>
+          </div>
+          <div class="proj-tags">
+            <span class="pbadge pb-green">* honorable mention</span>
+            <span class="pbadge pb-pink">mental health</span>
+            <span class="pbadge pb-blue">react</span>
+            <a href="https://devpost.com/software/soulscape-qzradn" target="_blank" class="proj-link">devpost ↗</a>
+          </div>
+        </div>
+
+        <div class="project-item">
+          <div class="proj-num">02</div>
+          <div>
+            <div class="proj-title">CalmCommute</div>
+            <div class="proj-desc">Navigation that prioritises mental health over speed. Colour-coded stress routing, an "I need a break" button that auto-reroutes without asking, and built-in 4-7-8 breathing exercises. Built because I actually needed it. Google Maps Platform, React, Node.js.</div>
+          </div>
+          <div class="proj-tags">
+            <span class="pbadge pb-green">hackathon</span>
+            <span class="pbadge pb-amber">accessibility</span>
+            <span class="pbadge pb-blue">maps api</span>
+            <a href="https://devpost.com/software/calm-commute" target="_blank" class="proj-link">devpost ↗</a>
+          </div>
+        </div>
+
+        <div class="project-item">
+          <div class="proj-num">03</div>
+          <div>
+            <div class="proj-title">SPYDR</div>
+            <div class="proj-desc"><em>Self-Aware Persona Yielding Digital Reasoner.</em> A quad spider robot with an AI that learns from itself — not about being smart, but about being self-aware. CAD model in progress, servo-based locomotion, my lil AI buddy that will definitely not turn against me.</div>
+          </div>
+          <div class="proj-tags">
+            <span class="pbadge pb-purple">in development</span>
+            <span class="pbadge pb-amber">robotics</span>
+            <span class="pbadge pb-blue">AI · servos</span>
+            <span class="proj-link" style="color:var(--muted);cursor:default;font-style:italic">cad in progress</span>
+          </div>
+        </div>
+
+        <div class="project-item">
+          <div class="proj-num">04</div>
+          <div>
+            <div class="proj-title">Project Levitas</div>
+            <div class="proj-desc">My flagship long-term research project. Theoretical and experimental framework for surface-agnostic personal levitation using a hybrid of EAD thrust and superconducting flux pinning. Formal research report written. Prototypes in planning. University professors being emailed.</div>
+          </div>
+          <div class="proj-tags">
+            <span class="pbadge pb-blue">active research</span>
+            <span class="pbadge pb-green">physics</span>
+            <span class="pbadge pb-amber">engineering</span>
+            <a href="#levitas" class="proj-link">learn more ↗</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- LEVITAS -->
+  <section id="levitas">
+    <div class="levitas-header reveal">
+      <div>
+        <p class="section-label">flagship research project</p>
+        <h2 class="section-title">Project Levitas</h2>
+      </div>
+      <span class="active-badge">* active research</span>
+    </div>
+    <div class="lev-cards reveal">
+      <div class="card" style="--card-accent:var(--accent)">
+        <span class="card-ascii">
+          [ goal ]<br/>
+          --------<br/>
+          ^ lift ^<br/>
+          --------
+        </span>
+        <div class="card-title">The Goal</div>
+        <div class="card-body">A wearable levitation system that works over any surface — concrete, wood, soil, water. No special floor needed. The device brings its own lift. Working toward this since age nine.</div>
+        <span class="card-tag">surface-agnostic</span>
+      </div>
+      <div class="card" style="--card-accent:var(--accent2)">
+        <span class="card-ascii" style="color:var(--accent2)">
+          &nbsp;~> ion wind<br/>
+          +------+<br/>
+          | EAD  |<br/>
+          +------+<br/>
+          &nbsp;~> thrust
+        </span>
+        <div class="card-title">EAD Thrust</div>
+        <div class="card-body">Electroaerodynamic propulsion — ionic wind from a high-voltage field, no moving parts. Pushes against air, not ground. Proven at aircraft scale by MIT in 2018.</div>
+        <span class="card-tag" style="background:rgba(246,173,85,0.1);color:var(--accent2)">mechanism A</span>
+      </div>
+      <div class="card" style="--card-accent:var(--accent3)">
+        <span class="card-ascii" style="color:var(--accent3)">
+          &nbsp;* flux pin *<br/>
+          --[====]--<br/>
+          &nbsp;|stable|<br/>
+          --[====]--<br/>
+          &nbsp;* zero E *
+        </span>
+        <div class="card-title">Flux Pinning</div>
+        <div class="card-body">Superconducting quantum flux pinning for passive three-axis stability. Zero ongoing energy cost. The only known levitation mechanism that is inherently stable.</div>
+        <span class="card-tag" style="background:rgba(104,211,145,0.1);color:var(--accent3)">mechanism B</span>
+      </div>
+    </div>
+    <div class="lev-timeline reveal">
+      <div class="tl-item" style="--dot:var(--accent3)">
+        <div class="tl-num">PHASE 01 — NOW</div>
+        <div class="tl-title">Theory & Documentation</div>
+        <div class="tl-desc">Technical research report complete. Vision document complete. Actively seeking academic mentorship at UofT, Waterloo, and MIT.</div>
+      </div>
+      <div class="tl-item" style="--dot:var(--accent)">
+        <div class="tl-num">PHASE 02 — NEXT</div>
+        <div class="tl-title">First Prototypes</div>
+        <div class="tl-desc">Building an EAD ionic wind thruster and a superconducting flux pinning demo. Real hardware, real measurements, real data.</div>
+      </div>
+      <div class="tl-item" style="--dot:var(--accent2)">
+        <div class="tl-num">PHASE 03 — MEDIUM TERM</div>
+        <div class="tl-title">Scaled Research</div>
+        <div class="tl-desc">University physics. Lab access. Quantitative modelling of the EAD scaling curve and flux pinning force equations.</div>
+      </div>
+      <div class="tl-item" style="--dot:var(--muted)">
+        <div class="tl-num">PHASE 04 — LONG TERM</div>
+        <div class="tl-title">Working System</div>
+        <div class="tl-desc">Human-scale EAD + flux pinning hybrid. Surface-agnostic personal levitation. The original goal, made real.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="contact-inner">
+      <div class="contact-grid reveal">
+        <div>
+          <p class="section-label">get in touch</p>
+          <h2 class="contact-big">Let's talk about<br/><span style="color:var(--accent)">the future.</span></h2>
+          <p class="contact-sub">For research collaboration, art, or just because you share a hyperfixation — I'm around.</p>
+          <div class="contact-links">
+            <a href="mailto:levitas.research@gmail.com" class="contact-link">
+              <span class="cl-sigil">[~]</span> levitas.research@gmail.com
+            </a>
+            <a href="mailto:hello@rivenworks.click" class="contact-link">
+              <span class="cl-sigil">[@]</span> hello@rivenworks.click
+            </a>
+            <a href="https://www.youtube.com/channel/UCWP9Sqnni0PfHaXmKeNlQ3A" target="_blank" class="contact-link yt">
+              <span class="cl-sigil">[>]</span> youtube / rivenator101
+            </a>
+            <a href="https://ko-fi.com/rivenator101" target="_blank" class="contact-link amber">
+              <span class="cl-sigil">[#]</span> ko-fi / support my work
+            </a>
+            <a href="https://www.tumblr.com/blog/liz-lives" target="_blank" class="contact-link pink">
+              <span class="cl-sigil">[*]</span> tumblr / art & writing
+            </a>
+            <a href="https://devpost.com/Rivenator101" target="_blank" class="contact-link">
+              <span class="cl-sigil">[/]</span> devpost / hackathon projects
+            </a>
+          </div>
+        </div>
+        <div>
+          <div class="about-terminal">
+            <div class="terminal-bar">
+              <div class="terminal-dot" style="background:#ff5f57"></div>
+              <div class="terminal-dot" style="background:#ffbd2e"></div>
+              <div class="terminal-dot" style="background:#28c840"></div>
+            </div>
+            <div class="terminal-body">
+              <div><span class="t-m">$ </span><span class="t-a">cat disclaimer.txt</span></div>
+              <div>&nbsp;</div>
+              <div><span class="t-p">if i said something that</span></div>
+              <div><span class="t-p">doesn't make sense...</span></div>
+              <div><span class="t-o">i typed faster than my</span></div>
+              <div><span class="t-o">brain processed thoughts.</span></div>
+              <div>&nbsp;</div>
+              <div><span class="t-m">$ </span><span class="t-a">cat spydr_status.txt</span></div>
+              <div><span class="t-pu">SPYDR is watching.</span></div>
+              <div><span class="t-pu">he is a cad model for now.</span></div>
+              <div><span class="t-m">// </span><span class="t-g">he's trying his best</span></div>
+              <div>&nbsp;</div>
+              <div><span class="t-m">$ </span><span class="t-a">cat current_hyperfixation</span></div>
+              <div><span class="t-p">classified.</span></div>
+              <div><span class="t-m">// </span><span class="t-o">it's red hood.</span></div>
+              <div>&nbsp;</div>
+              <div><span class="t-m">$ </span><span class="t-cur"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-left"><span>rivenworks.click</span> — riven · ontario canada · 2026</div>
+    <div class="footer-right">she/they/it · built with too much caffeine · [*] spydr approved</div>
+  </footer>
+
+  <script>
+    const cursor=document.getElementById('cursor'),ring=document.getElementById('cursorRing');
+    let mx=0,my=0,rx=0,ry=0;
+    document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx+'px';cursor.style.top=my+'px';});
+    function animRing(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(animRing);}
+    animRing();
+    document.querySelectorAll('a,button').forEach(el=>{
+      el.addEventListener('mouseenter',()=>{cursor.style.width='20px';cursor.style.height='20px';ring.style.width='60px';ring.style.height='60px';});
+      el.addEventListener('mouseleave',()=>{cursor.style.width='12px';cursor.style.height='12px';ring.style.width='36px';ring.style.height='36px';});
+    });
+    const canvas=document.getElementById('stars'),ctx=canvas.getContext('2d');let stars=[];
+    function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+    resize();window.addEventListener('resize',resize);
+    function initStars(){stars=Array.from({length:220},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.2+.2,a:Math.random(),speed:Math.random()*.003+.001,phase:Math.random()*Math.PI*2}));}
+    initStars();let t=0;
+    function drawStars(){ctx.clearRect(0,0,canvas.width,canvas.height);t+=.01;stars.forEach(s=>{const alpha=s.a*(.5+.5*Math.sin(t*s.speed*100+s.phase));ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(200,220,255,${alpha})`;ctx.fill();});requestAnimationFrame(drawStars);}
+    drawStars();
+    function spawnParticle(){const p=document.createElement('div');p.className='particle';const size=Math.random()*3+1;const colors=['var(--accent)','var(--accent2)','var(--accent3)','var(--accent4)','var(--accent5)'];const color=colors[Math.floor(Math.random()*colors.length)];const drift=(Math.random()-.5)*200+'px';const dur=Math.random()*12+8;p.style.cssText=`width:${size}px;height:${size}px;background:${color};left:${Math.random()*100}vw;bottom:-10px;--drift:${drift};animation-duration:${dur}s;animation-delay:${Math.random()*5}s;opacity:0.4;`;document.body.appendChild(p);setTimeout(()=>p.remove(),(dur+5)*1000);}
+    setInterval(spawnParticle,1000);
+    const reveals=document.querySelectorAll('.reveal');
+    const obs=new IntersectionObserver(entries=>{entries.forEach((e,i)=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('visible'),i*100);obs.unobserve(e.target);}});},{threshold:.1});
+    reveals.forEach(r=>obs.observe(r));
+    const nameEl=document.getElementById('heroName');
+    const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%';
+    setTimeout(()=>{let iter=0;const target='RIVEN';const iv=setInterval(()=>{nameEl.textContent=target.split('').map((c,i)=>i<iter?c:chars[Math.floor(Math.random()*chars.length)]).join('');if(iter>=target.length)clearInterval(iv);iter+=.4;},40);},600);
+  </script>
+</body>
+</html>
