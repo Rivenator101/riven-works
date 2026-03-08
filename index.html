@@ -5,8 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>RIVEN — rivenworks</title>
 
-  <!-- SVG favicon: little spider on dark bg -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23060810'/%3E%3Cline x1='16' y1='2' x2='16' y2='30' stroke='%2363b3ed' stroke-width='0.7' opacity='0.5'/%3E%3Cline x1='2' y1='16' x2='30' y2='16' stroke='%2363b3ed' stroke-width='0.7' opacity='0.5'/%3E%3Cline x1='5' y1='5' x2='27' y2='27' stroke='%2363b3ed' stroke-width='0.7' opacity='0.5'/%3E%3Cline x1='27' y1='5' x2='5' y2='27' stroke='%2363b3ed' stroke-width='0.7' opacity='0.5'/%3E%3Ccircle cx='16' cy='16' r='5' fill='none' stroke='%2363b3ed' stroke-width='0.7' opacity='0.4'/%3E%3Ccircle cx='16' cy='16' r='10' fill='none' stroke='%2363b3ed' stroke-width='0.7' opacity='0.25'/%3E%3Cellipse cx='16' cy='17' rx='3.5' ry='4.5' fill='%23f687b3'/%3E%3Ccircle cx='16' cy='12.5' r='2.8' fill='%23f687b3'/%3E%3Ccircle cx='14.8' cy='12' r='0.7' fill='%23060810'/%3E%3Ccircle cx='17.2' cy='12' r='0.7' fill='%23060810'/%3E%3Cline x1='12.5' y1='15' x2='7' y2='12' stroke='%2363b3ed' stroke-width='1.1' stroke-linecap='round'/%3E%3Cline x1='12.5' y1='17' x2='6.5' y2='17' stroke='%2363b3ed' stroke-width='1.1' stroke-linecap='round'/%3E%3Cline x1='12.5' y1='19' x2='7' y2='22' stroke='%2363b3ed' stroke-width='1.1' stroke-linecap='round'/%3E%3Cline x1='19.5' y1='15' x2='25' y2='12' stroke='%2363b3ed' stroke-width='1.1' stroke-linecap='round'/%3E%3Cline x1='19.5' y1='17' x2='25.5' y2='17' stroke='%2363b3ed' stroke-width='1.1' stroke-linecap='round'/%3E%3Cline x1='19.5' y1='19' x2='25' y2='22' stroke='%2363b3ed' stroke-width='1.1' stroke-linecap='round'/%3E%3C/svg%3E"/>
+  <link rel="icon" id="favicon" type="image/png"/>
 
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;1,9..40,300&display=swap" rel="stylesheet"/>
   <style>
@@ -543,11 +542,11 @@
           <h2 class="contact-big">Let's talk about<br/><span style="color:var(--accent)">the future.</span></h2>
           <p class="contact-sub">For research collaboration, art, or just because you share a hyperfixation — I'm around.</p>
           <div class="contact-links">
-            <a href="mailto:levitas.research@gmail.com" class="contact-link">
-              <span class="cl-sigil">[~]</span> levitas.research@gmail.com
+            <a href="/cdn-cgi/l/email-protection#6b070e1d021f0a1845190e180e0a1908032b0c060a020745080406" class="contact-link">
+              <span class="cl-sigil">[~]</span> <span class="__cf_email__" data-cfemail="731f16051a0712005d011600161201101b33141e121a1f5d101c1e">[email&#160;protected]</span>
             </a>
-            <a href="mailto:rivenator1@gmail.com" class="contact-link">
-              <span class="cl-sigil">[@]</span> rivenator1@gmail.com
+            <a href="/cdn-cgi/l/email-protection#f69e939a9a99b6849f8093988199849d85d8959a9f959d" class="contact-link">
+              <span class="cl-sigil">[@]</span> <span class="__cf_email__" data-cfemail="365e535a5a5976445f4053584159445d4518555a5f555d">[email&#160;protected]</span>
             </a>
             <a href="https://www.youtube.com/channel/UCWP9Sqnni0PfHaXmKeNlQ3A" target="_blank" class="contact-link yt">
               <span class="cl-sigil">[>]</span> youtube / rivenator101
@@ -600,7 +599,39 @@
     <div class="footer-right">she/they/it · built with too much caffeine · [*] spydr approved</div>
   </footer>
 
-  <script>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    // FAVICON — draw spider on canvas, set as icon
+    (function(){
+      const c=document.createElement('canvas');
+      c.width=32;c.height=32;
+      const x=c.getContext('2d');
+      // bg
+      x.fillStyle='#060810';
+      x.beginPath();x.roundRect(0,0,32,32,5);x.fill();
+      // web lines
+      x.strokeStyle='rgba(99,179,237,0.45)';x.lineWidth=.7;
+      [[16,2,16,30],[2,16,30,16],[4,4,28,28],[28,4,4,28]].forEach(([x1,y1,x2,y2])=>{x.beginPath();x.moveTo(x1,y1);x.lineTo(x2,y2);x.stroke();});
+      // web rings
+      [5,10].forEach(r=>{x.beginPath();x.arc(16,16,r,0,Math.PI*2);x.globalAlpha=r===5?.45:.3;x.stroke();});
+      x.globalAlpha=1;
+      // legs left
+      x.strokeStyle='#63b3ed';x.lineWidth=1.3;x.lineCap='round';
+      [[12,14,6,11],[12,17,5.5,17],[12,20,6,23]].forEach(([x1,y1,x2,y2])=>{x.beginPath();x.moveTo(x1,y1);x.lineTo(x2,y2);x.stroke();});
+      // legs right
+      [[20,14,26,11],[20,17,26.5,17],[20,20,26,23]].forEach(([x1,y1,x2,y2])=>{x.beginPath();x.moveTo(x1,y1);x.lineTo(x2,y2);x.stroke();});
+      // body
+      x.fillStyle='#f687b3';
+      x.beginPath();x.ellipse(16,18,3.5,4.5,0,0,Math.PI*2);x.fill();
+      // head
+      x.beginPath();x.arc(16,12.5,2.8,0,Math.PI*2);x.fill();
+      // eyes
+      x.fillStyle='#060810';
+      x.beginPath();x.arc(14.8,12,.75,0,Math.PI*2);x.fill();
+      x.beginPath();x.arc(17.2,12,.75,0,Math.PI*2);x.fill();
+      // set favicon
+      document.getElementById('favicon').href=c.toDataURL('image/png');
+    })();
+
     const cursor=document.getElementById('cursor'),ring=document.getElementById('cursorRing');
     let mx=0,my=0,rx=0,ry=0;
     document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx+'px';cursor.style.top=my+'px';});
@@ -621,10 +652,4 @@
     setInterval(spawnParticle,1000);
     const reveals=document.querySelectorAll('.reveal');
     const obs=new IntersectionObserver(entries=>{entries.forEach((e,i)=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('visible'),i*100);obs.unobserve(e.target);}});},{threshold:.1});
-    reveals.forEach(r=>obs.observe(r));
-    const nameEl=document.getElementById('heroName');
-    const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%';
-    setTimeout(()=>{let iter=0;const target='RIVEN';const iv=setInterval(()=>{nameEl.textContent=target.split('').map((c,i)=>i<iter?c:chars[Math.floor(Math.random()*chars.length)]).join('');if(iter>=target.length)clearInterval(iv);iter+=.4;},40);},600);
-  </script>
-</body>
-</html>
+    reveals.forEach(r=>obs.observe(r))
