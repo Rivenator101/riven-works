@@ -676,54 +676,96 @@
 ( o o ) 
  > ^ <
 </pre>
+  <div style="
+  margin-top:1rem;
+  font-family:'Space Mono', monospace;
+  font-size:.7rem;
+  color:var(--accent);
+  letter-spacing:.1em;
+">
+  pets: <span id="petCount">0</span>
+</div>
 </div>
 
 <script>
 (function(){
   const cat = document.getElementById("asciiCat");
+  const counterEl = document.getElementById("petCount");
 
   const states = {
+    idle:  ` /\\_/\\  
+( o o ) 
+ > ^ <`,
+
     left:  ` /\\_/\\  
 ( • o ) 
  > ^ <`,
-    center:` /\\_/\\  
-( o o ) 
- > ^ <`,
+
     right: ` /\\_/\\  
 ( o • ) 
  > ^ <`,
+
+    happy: ` /\\_/\\  
+( ^ o ^ ) 
+ > ^ <`,
+
     blink: ` /\\_/\\  
 ( - - ) 
  > ^ <`
   };
 
   let mouseX = window.innerWidth / 2;
+  let lastMove = Date.now();
+
+  // load saved pets
+  let pets = Number(localStorage.getItem("asciiCatPets") || 0);
+  counterEl.textContent = pets;
 
   window.addEventListener("mousemove", (e) => {
     mouseX = e.clientX;
+    lastMove = Date.now();
   });
 
-  function updateCat(){
+  cat.style.cursor = "pointer";
+
+  cat.addEventListener("click", () => {
+    pets++;
+    localStorage.setItem("asciiCatPets", pets);
+    counterEl.textContent = pets;
+
+    cat.textContent = states.happy;
+
+    setTimeout(() => update(), 500);
+  });
+
+  function update(){
     const w = window.innerWidth;
     const zone = mouseX / w;
+    const idleTime = Date.now() - lastMove;
 
     let frame;
 
-    if (Math.random() < 0.03) {
-      frame = states.blink; // occasional blink
-    } else if (zone < 0.4) {
+    if (Math.random() < 0.02) {
+      frame = states.blink;
+    } 
+    else if (idleTime > 4000) {
+      frame = states.idle;
+    }
+    else if (zone < 0.4) {
       frame = states.left;
-    } else if (zone > 0.6) {
+    } 
+    else if (zone > 0.6) {
       frame = states.right;
-    } else {
-      frame = states.center;
+    } 
+    else {
+      frame = states.idle;
     }
 
     cat.textContent = frame;
-    requestAnimationFrame(updateCat);
+    requestAnimationFrame(update);
   }
 
-  updateCat();
+  update();
 })();
 </script>
   <footer>
