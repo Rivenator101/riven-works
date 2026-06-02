@@ -661,20 +661,71 @@
       </p>
     </div>
   </section>
-<pre style="
+<!-- CURSOR-TRACKING ASCII CAT -->
+<div style="
   text-align:center;
   padding:4rem 2rem;
   font-family:'Space Mono', monospace;
   color:var(--muted);
   line-height:1.2;
   font-size:.9rem;
-  margin:0;
+  white-space:pre;
 ">
- _._     _,-'""`-._
-(,-.`._,'(       |\`-/|
-    `-.-' \ )-`( , o o)
-          `-    \`_`"'-._
+<pre id="asciiCat">
+ /\_/\  
+( o o ) 
+ > ^ <
 </pre>
+</div>
+
+<script>
+(function(){
+  const cat = document.getElementById("asciiCat");
+
+  const states = {
+    left:  ` /\\_/\\  
+( • o ) 
+ > ^ <`,
+    center:` /\\_/\\  
+( o o ) 
+ > ^ <`,
+    right: ` /\\_/\\  
+( o • ) 
+ > ^ <`,
+    blink: ` /\\_/\\  
+( - - ) 
+ > ^ <`
+  };
+
+  let mouseX = window.innerWidth / 2;
+
+  window.addEventListener("mousemove", (e) => {
+    mouseX = e.clientX;
+  });
+
+  function updateCat(){
+    const w = window.innerWidth;
+    const zone = mouseX / w;
+
+    let frame;
+
+    if (Math.random() < 0.03) {
+      frame = states.blink; // occasional blink
+    } else if (zone < 0.4) {
+      frame = states.left;
+    } else if (zone > 0.6) {
+      frame = states.right;
+    } else {
+      frame = states.center;
+    }
+
+    cat.textContent = frame;
+    requestAnimationFrame(updateCat);
+  }
+
+  updateCat();
+})();
+</script>
   <footer>
     <div class="footer-left"><span>rivenworks.click</span> — riven · ontario canada · 2026</div>
     <div class="footer-right">they/them it/its · built with too much caffeine · [*] spydr approved</div>
