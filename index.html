@@ -34,6 +34,18 @@
     .nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:1px;background:var(--accent);transform:scaleX(0);transition:transform .2s;}
     .nav-links a:hover{color:var(--accent);}
     .nav-links a:hover::after{transform:scaleX(1);}
+    @keyframes catJump {
+  0%   { transform: translateY(0); }
+  30%  { transform: translateY(-18px) scale(1.05); }
+  60%  { transform: translateY(0); }
+  80%  { transform: translateY(-6px); }
+  100% { transform: translateY(0); }
+}
+
+.cat-jump {
+  display: inline-block;
+  animation: catJump 0.45s ease;
+}
 
     /* HERO */
     #hero{min-height:100vh;display:flex;align-items:center;padding:0 3rem;overflow:hidden;}
@@ -709,6 +721,10 @@
 ( ^ o ^ ) 
  > ^ <`,
 
+    startled: ` /\\_/\\  
+( O O ) 
+ > ^ <`,
+
     blink: ` /\\_/\\  
 ( - - ) 
  > ^ <`
@@ -717,9 +733,10 @@
   let mouseX = window.innerWidth / 2;
   let lastMove = Date.now();
 
-  // load saved pets
   let pets = Number(localStorage.getItem("asciiCatPets") || 0);
   counterEl.textContent = pets;
+
+  let moodToggle = true; // alternates happy/startled
 
   window.addEventListener("mousemove", (e) => {
     mouseX = e.clientX;
@@ -728,12 +745,21 @@
 
   cat.style.cursor = "pointer";
 
+  function triggerJump(){
+    cat.classList.add("cat-jump");
+    setTimeout(() => cat.classList.remove("cat-jump"), 450);
+  }
+
   cat.addEventListener("click", () => {
     pets++;
     localStorage.setItem("asciiCatPets", pets);
     counterEl.textContent = pets;
 
-    cat.textContent = states.happy;
+    triggerJump();
+
+    // alternating emotional reaction
+    cat.textContent = moodToggle ? states.happy : states.startled;
+    moodToggle = !moodToggle;
 
     setTimeout(() => update(), 500);
   });
@@ -747,16 +773,16 @@
 
     if (Math.random() < 0.02) {
       frame = states.blink;
-    } 
+    }
     else if (idleTime > 4000) {
       frame = states.idle;
     }
     else if (zone < 0.4) {
       frame = states.left;
-    } 
+    }
     else if (zone > 0.6) {
       frame = states.right;
-    } 
+    }
     else {
       frame = states.idle;
     }
